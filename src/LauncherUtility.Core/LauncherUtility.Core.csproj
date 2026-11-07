@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Playnite-independent logic: models, catalog merging, rule evaluation, auto-launch bookkeeping, persistence. -->
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <RootNamespace>LauncherUtility.Core</RootNamespace>
+    <AssemblyName>LauncherUtility.Core</AssemblyName>
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <!-- Playnite ships Newtonsoft.Json 10.0.0.0; compile against it but never copy it. -->
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="LauncherUtility.Core.Tests" />
+  </ItemGroup>
+</Project>

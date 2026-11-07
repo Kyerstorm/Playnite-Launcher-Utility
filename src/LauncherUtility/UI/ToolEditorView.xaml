@@ -1,0 +1,170 @@
+<UserControl x:Class="LauncherUtility.UI.ToolEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,14,0,6" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,6" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel Margin="16,8,16,12">
+        <!-- Buttons -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0" LastChildFill="True">
+            <Button DockPanel.Dock="Right" Content="Cancel" Padding="16,4" Margin="8,0,0,0" IsCancel="True" Command="{Binding CancelCommand}" />
+            <Button DockPanel.Dock="Right" Content="Save" Padding="16,4" IsDefault="True" Command="{Binding SaveCommand}" />
+            <TextBlock Text="{Binding ValidationError}" Foreground="#FFE5534B" TextWrapping="Wrap" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Tool -->
+                <TextBlock Text="Tool" Style="{StaticResource Section}" Margin="0,4,0,6" />
+                <TextBlock Style="{StaticResource Hint}"
+                           Text="Name, path and arguments come from Library → Software Tools; edit them there. Here you set Launcher-only options."
+                           Visibility="{Binding IsSoftwareTool, Converter={StaticResource BoolToVis}}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Name" Style="{StaticResource Label}" />
+                    <TextBox Grid.Column="1" Grid.ColumnSpan="2" Margin="0,3" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{Binding IsSoftwareTool}" />
+
+                    <TextBlock Grid.Row="1" Text="Program" Style="{StaticResource Label}" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0,3" Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{Binding IsSoftwareTool}" />
+                    <Button Grid.Row="1" Grid.Column="2" Content="Browse…" Margin="6,3,0,3" Padding="10,2"
+                            Command="{Binding BrowsePathCommand}" IsEnabled="{Binding CanEditBasics}" />
+
+                    <TextBlock Grid.Row="2" Text="Arguments" Style="{StaticResource Label}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,3" Text="{Binding Arguments, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{Binding IsSoftwareTool}" />
+
+                    <TextBlock Grid.Row="3" Text="Working folder" Style="{StaticResource Label}" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Margin="0,3" Text="{Binding WorkingDir, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{Binding IsSoftwareTool}" ToolTip="Empty = the program's own folder" />
+                    <Button Grid.Row="3" Grid.Column="2" Content="Browse…" Margin="6,3,0,3" Padding="10,2"
+                            Command="{Binding BrowseWorkingDirCommand}" IsEnabled="{Binding CanEditBasics}" />
+
+                    <TextBlock Grid.Row="4" Text="Icon" Style="{StaticResource Label}" />
+                    <TextBox Grid.Row="4" Grid.Column="1" Margin="0,3" Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged}"
+                             IsReadOnly="{Binding IsSoftwareTool}" ToolTip="Empty = the program's own icon" />
+                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal" IsEnabled="{Binding CanEditBasics}">
+                        <Button Content="Browse…" Margin="6,3,0,3" Padding="10,2" Command="{Binding BrowseIconCommand}" />
+                        <Button Content="Clear" Margin="4,3,0,3" Padding="8,2" Command="{Binding ClearIconCommand}" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="5" Text="Category" Style="{StaticResource Label}" />
+                    <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,3" IsEditable="True"
+                              ItemsSource="{Binding KnownCategories}" Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="Optional. Used when 'Group by category' is on." />
+                </Grid>
+
+                <CheckBox Content="Run as administrator (shows a UAC prompt)" Margin="0,8,0,2" IsChecked="{Binding RunAsAdmin}" />
+                <CheckBox Content="If it is already open, switch to it instead of starting another copy" Margin="0,2" IsChecked="{Binding SingleInstance}" />
+                <CheckBox Content="Hide from the Launcher" Margin="0,2" IsChecked="{Binding Hidden}"
+                          Visibility="{Binding IsSoftwareTool, Converter={StaticResource BoolToVis}}" />
+
+                <!-- Auto-launch -->
+                <TextBlock Text="Auto-launch" Style="{StaticResource Section}" />
+                <CheckBox Content="Start this tool automatically" IsChecked="{Binding RuleEnabled}" />
+                <StackPanel Margin="22,6,0,0" IsEnabled="{Binding RuleEnabled}">
+                    <CheckBox Content="When Playnite starts" Margin="0,2" IsChecked="{Binding StartWithPlaynite}" />
+                    <CheckBox Content="When a matching game starts" Margin="0,2" IsChecked="{Binding StartWithGame}" />
+                    <StackPanel Margin="22,4,0,0" IsEnabled="{Binding StartWithGame}">
+                        <CheckBox Content="Close it when that game exits (only if Launcher started it)" Margin="0,2" IsChecked="{Binding CloseOnGameExit}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <TextBlock Text="Wait" Style="{StaticResource Label}" Margin="0,0,6,0" />
+                            <TextBox Width="60" Text="{Binding DelaySeconds, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Text="seconds after the game starts" Style="{StaticResource Label}" Margin="6,0,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Text="Matching games" FontWeight="SemiBold" Margin="0,10,0,2" Foreground="{DynamicResource TextBrush}" />
+                        <TextBlock Style="{StaticResource Hint}"
+                                   Text="Conditions are read top to bottom. No conditions means every game." />
+                        <ItemsControl ItemsSource="{Binding Conditions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="140" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Content="not" VerticalAlignment="Center" Margin="0,0,8,0" IsChecked="{Binding Not}" />
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding DataContext.TypeOptions, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Type}" />
+                                        <ComboBox Grid.Column="2" Margin="6,0" IsEditable="True" IsTextSearchEnabled="True"
+                                                  ItemsSource="{Binding Options}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                                  SelectedValue="{Binding SelectedId}"
+                                                  Visibility="{Binding IsItemType, Converter={StaticResource BoolToVis}}">
+                                            <ComboBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel />
+                                                </ItemsPanelTemplate>
+                                            </ComboBox.ItemsPanel>
+                                        </ComboBox>
+                                        <TextBox Grid.Column="2" Margin="6,0" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                                                 Visibility="{Binding IsTextType, Converter={StaticResource BoolToVis}}" />
+                                        <ComboBox Grid.Column="3"
+                                                  ItemsSource="{Binding DataContext.JoinerOptions, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Joiner}"
+                                                  ToolTip="How this condition combines with the next one">
+                                            <ComboBox.Style>
+                                                <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                                            <Setter Property="Visibility" Value="Hidden" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ComboBox.Style>
+                                        </ComboBox>
+                                        <Button Grid.Column="4" Content="Remove" Margin="6,0,0,0" Padding="8,1"
+                                                Command="{Binding DataContext.RemoveConditionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="Add condition" Padding="10,2" Command="{Binding AddConditionCommand}" />
+                            <Button Content="Preview matching games" Padding="10,2" Margin="8,0,0,0" Command="{Binding PreviewMatchesCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding MatchPreview}" Style="{StaticResource Hint}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

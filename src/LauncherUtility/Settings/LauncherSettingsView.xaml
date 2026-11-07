@@ -1,0 +1,64 @@
+<UserControl x:Class="LauncherUtility.Settings.LauncherSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Rendered inside Playnite's Add-on settings page; uses Playnite's own control styles. -->
+    <UserControl.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,18,0,8" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,6" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel Margin="20,6,20,20">
+        <!-- Behaviour -->
+        <StackPanel DockPanel.Dock="Top" MaxWidth="820" HorizontalAlignment="Left">
+            <TextBlock Text="Launcher window" Style="{StaticResource Section}" Margin="0,6,0,8" />
+            <CheckBox Content="Close the Launcher after launching a tool" Margin="0,3" IsChecked="{Binding CloseAfterLaunch}" />
+            <CheckBox Content="Group tools by category" Margin="0,3" IsChecked="{Binding GroupByCategory}" />
+            <CheckBox Content="Remember the Launcher window's size and position" Margin="0,3" IsChecked="{Binding RememberWindowBounds}" />
+            <CheckBox Content="Include Playnite's Library → Software Tools" Margin="0,3" IsChecked="{Binding IncludeSoftwareTools}" />
+            <TextBlock Text="{Binding SoftwareToolsStatus}" Style="{StaticResource Hint}" Margin="22,0,0,6" />
+
+            <TextBlock Text="Auto-launch" Style="{StaticResource Section}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="When a game exits, give auto-started tools" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+                <TextBox Width="50" Margin="8,0" Text="{Binding CloseTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="seconds to close before forcing them" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Only tools that Launcher itself started for that game are closed. Tools you had open already are left alone." />
+
+            <TextBlock Text="Tools" Style="{StaticResource Section}" />
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="Double-click a tool to edit it. Software Tools keep their name and path in Playnite; Launcher adds a category, admin, focus and auto-launch options." />
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
+                <Button Content="Add tool…" Padding="12,3" Command="{Binding AddToolCommand}" />
+                <Button Content="Edit…" Padding="12,3" Margin="8,0,0,0" Command="{Binding EditToolCommand}" />
+                <Button Content="Remove" Padding="12,3" Margin="8,0,0,0" Command="{Binding RemoveToolCommand}" />
+                <Button Content="Hide / show" Padding="12,3" Margin="8,0,0,0" Command="{Binding ToggleHiddenCommand}"
+                        ToolTip="Hide a Software Tool from the Launcher without removing it from Playnite" />
+            </StackPanel>
+        </StackPanel>
+
+        <ListView ItemsSource="{Binding Tools}" SelectedItem="{Binding SelectedTool}" MinHeight="160"
+                  MouseDoubleClick="OnToolDoubleClick" AutomationProperties.Name="Tools">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="220" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Source" Width="110" DisplayMemberBinding="{Binding Source}" />
+                    <GridViewColumn Header="Category" Width="130" DisplayMemberBinding="{Binding Category}" />
+                    <GridViewColumn Header="Options" Width="320" DisplayMemberBinding="{Binding Status}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
+</UserControl>

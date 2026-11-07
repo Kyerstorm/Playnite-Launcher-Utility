@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LauncherUtility.Core/LauncherUtility.Core.csproj" />
+    <Project Path="src/LauncherUtility/LauncherUtility.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LauncherUtility.Core.Tests/LauncherUtility.Core.Tests.csproj" />
+  </Folder>
+</Solution>

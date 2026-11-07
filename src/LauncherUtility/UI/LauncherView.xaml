@@ -1,0 +1,96 @@
+<UserControl x:Class="LauncherUtility.UI.LauncherView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Hosted in a Playnite-styled window; relies on Playnite's control styles and theme brushes. -->
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+
+    <DockPanel Margin="10">
+        <!-- Search -->
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBox x:Name="SearchBox"
+                     Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+                     PreviewKeyDown="OnSearchKeyDown"
+                     AutomationProperties.Name="Search tools" />
+            <TextBlock Text="Search tools…" IsHitTestVisible="False" Opacity="0.5" Margin="9,0,0,0"
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"
+                       Visibility="{Binding IsQueryEmpty, Converter={StaticResource BoolToVis}}" />
+        </Grid>
+
+        <!-- Footer -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" LastChildFill="False">
+            <CheckBox DockPanel.Dock="Left" Content="Group by category" VerticalAlignment="Center"
+                      IsChecked="{Binding GroupByCategory}" />
+            <Button DockPanel.Dock="Right" Content="Settings" Padding="12,4" Command="{Binding OpenSettingsCommand}" />
+        </DockPanel>
+
+        <Grid>
+            <ListBox x:Name="ToolList"
+                     ItemsSource="{Binding View}"
+                     SelectedItem="{Binding Selected}"
+                     PreviewKeyDown="OnListKeyDown"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                     AutomationProperties.Name="Tools">
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Opacity="0.7" Margin="6,10,0,4"
+                                           Foreground="{DynamicResource TextBrush}" />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <EventSetter Event="MouseLeftButtonUp" Handler="OnItemClicked" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CanLaunch}" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding Icon}" Width="20" Height="20" VerticalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0">
+                                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextBrush}" />
+                                <TextBlock Text="{Binding Category}" FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           Visibility="{Binding HasCategory, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                            <Border Grid.Column="2" Margin="6,0" Padding="5,1" CornerRadius="3" VerticalAlignment="Center"
+                                    BorderThickness="1" BorderBrush="{DynamicResource TextBrush}" Opacity="0.6"
+                                    ToolTip="Runs as administrator"
+                                    Visibility="{Binding RunAsAdmin, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="admin" FontSize="10" Foreground="{DynamicResource TextBrush}" />
+                            </Border>
+                            <Ellipse Grid.Column="3" Width="9" Height="9" Margin="4,0" VerticalAlignment="Center"
+                                     Fill="#FF3FB950" ToolTip="Running"
+                                     Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="{Binding EmptyMessage}" TextAlignment="Center" TextWrapping="Wrap" Opacity="0.7"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
+                       Foreground="{DynamicResource TextBrush}"
+                       Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}" />
+        </Grid>
+    </DockPanel>
+</UserControl>
